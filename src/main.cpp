@@ -41,6 +41,18 @@ int main(int argc , char* argv[]){
 
 	if (filter == "blackWhite")
 		blackWhite(img);
+
+	if (filter == "edgeDetection")
+		edgeDetection(img);
+
+	if (filter == "zoom")
+		zoom(img);
+
+	if (filter == "merge")
+		merge(img);
+
+	if (filter == "crop")
+		crop(img);
 	
    	clock_gettime(CLOCK_REALTIME, &stop);
 
