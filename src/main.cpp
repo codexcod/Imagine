@@ -25,7 +25,8 @@ int main(int argc , char* argv[]){
 	}
 	
 	string filter = string(argv[1]);
-	unsigned int n = atoi(argv[2]);
+	unsigned int n_threads = atoi(argv[2]);
+	bool single_thread = n_threads == 1;
 	float p1 = atof(argv[3]);
 	string img1(argv[4]);
 	string out = string(argv[5]);
@@ -39,21 +40,21 @@ int main(int argc , char* argv[]){
 	if (filter == "plain")
 		plain(img, (unsigned char)p1);
 
-	if (filter == "blackWhite")
-		blackWhite(img);
+	if (filter == "BYN") {
+		// Blanco y Negro
+		// ./main BYW <n_threads> 0 <ruta_img> <ruta_img_result>
 
-	if (filter == "edgeDetection")
-		edgeDetection(img);
+		// El mejor resultado fue con 3 threads en 0.013076s, mas threads empeora
+		// Testeado en procesador intel i3-4170 de 2 nucleos con 4 threads.
 
-	if (filter == "zoom")
-		zoom(img);
+		// Singlethread fue de 0.022190s.
 
-	if (filter == "merge")
-		merge(img);
+		if (single_thread)
+			blackWhite(img, 0, img.height);
+		else
+			blackWhiteMultiThread(img, n_threads);
+	}
 
-	if (filter == "crop")
-		crop(img);
-	
    	clock_gettime(CLOCK_REALTIME, &stop);
 
 	double accum;
