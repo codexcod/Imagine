@@ -29,21 +29,30 @@ int main(int argc , char* argv[]){
 	bool single_thread = n_threads == 1;
 	float p1 = atof(argv[3]);
 	string img1_str(argv[4]);
-	string out = string(argv[5]);
-	float p2 = atof(argv[6]);
-	string img2_str(argv[7]);
-	
 	ppm img1(img1_str);
-	ppm img2(img2_str);
+	string out = string(argv[5]);
+	float p2;
+	string img2_str;
+	ppm img2;
+
+	if (argc == 8)
+	{
+		p2 = atof(argv[6]);
+		img2_str = argv[7];
+		img2 = ppm(img2_str);
+	}
+	
 
 	cout << "Aplicando filtros"<< endl;
 	struct timespec start, stop;    	
 	clock_gettime(CLOCK_REALTIME, &start);
 
-	if (filter == "plain")
+	if (filter == "plain") 
+	{
 		plain(img1, (unsigned char)p1);
-
-	if (filter == "BYN") {
+	}
+	else if (filter == "BYN") 
+	{
 		// Blanco y Negro
 		// ./main BYW <n_threads> 0 <ruta_img> <ruta_img_result>
 
@@ -56,13 +65,22 @@ int main(int argc , char* argv[]){
 			blackWhite(img1, 0, img1.height);
 		else
 			blackWhiteMultiThread(img1, n_threads);
-	}
-	if (filter == "merge") {
+	} 
+	else if (filter == "merge") 
+	{
 		// Merge de imagenes
-		// ./main merge <n_threads> <alpha> <ruta_img1> <ruta_img_result> 0 <ruta_img2>
+		// ./main merge 1 <alpha> <ruta_img1> <ruta_img_result> 0 <ruta_img2>
 
 		merge(img1, img2, p1);
 	} 
+	else if (filter == "zoom")
+	{
+		// Digital zoom de una imagen
+		// ./main zoom 1 <cantidad_zoom> <ruta_img1> <ruta_img_result>
+
+		ppm img(img1);
+		zoom(img1, img, p1);
+	}
 
    	clock_gettime(CLOCK_REALTIME, &stop);
 
