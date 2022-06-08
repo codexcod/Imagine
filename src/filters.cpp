@@ -59,3 +59,30 @@ void blackWhiteMultiThread(ppm& img, int n_threads)
         threads_result[i].join();
 	}
 }
+
+void merge(ppm& img1, ppm& img2, float alpha)
+{
+
+	float p1 = alpha;
+	float p2 = 1 - p1;
+
+	for(int i = 0; i < img1.height; i++)
+	{
+		for(int j = 0; j < img1.width; j++)
+		{	
+			int r1 = img1.getPixel(i, j).r;
+			int g1 = img1.getPixel(i, j).g;
+			int b1 = img1.getPixel(i, j).b;
+			
+			int r2 = img2.getPixel(i, j).r;
+			int g2 = img2.getPixel(i, j).g;
+			int b2 = img2.getPixel(i, j).g;
+
+			int r3 = r1 * p1 + r2 * p2;
+			int g3 = g1 * p1 + g2 * p2;
+			int b3 = b1 * p1 + b2 * p2;
+			
+			img1.setPixel(i,j, pixel(r3, g3, b3).truncate());
+		}		
+	}
+}

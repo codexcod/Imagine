@@ -28,17 +28,20 @@ int main(int argc , char* argv[]){
 	unsigned int n_threads = atoi(argv[2]);
 	bool single_thread = n_threads == 1;
 	float p1 = atof(argv[3]);
-	string img1(argv[4]);
+	string img1_str(argv[4]);
 	string out = string(argv[5]);
+	float p2 = atof(argv[6]);
+	string img2_str(argv[7]);
 	
-	ppm img(img1);
-	
+	ppm img1(img1_str);
+	ppm img2(img2_str);
+
 	cout << "Aplicando filtros"<< endl;
 	struct timespec start, stop;    	
 	clock_gettime(CLOCK_REALTIME, &start);
 
 	if (filter == "plain")
-		plain(img, (unsigned char)p1);
+		plain(img1, (unsigned char)p1);
 
 	if (filter == "BYN") {
 		// Blanco y Negro
@@ -50,10 +53,16 @@ int main(int argc , char* argv[]){
 		// Singlethread fue de 0.022190s.
 
 		if (single_thread)
-			blackWhite(img, 0, img.height);
+			blackWhite(img1, 0, img1.height);
 		else
-			blackWhiteMultiThread(img, n_threads);
+			blackWhiteMultiThread(img1, n_threads);
 	}
+	if (filter == "merge") {
+		// Merge de imagenes
+		// ./main merge <n_threads> <alpha> <ruta_img1> <ruta_img_result> 0 <ruta_img2>
+
+		merge(img1, img2, p1);
+	} 
 
    	clock_gettime(CLOCK_REALTIME, &stop);
 
@@ -62,7 +71,7 @@ int main(int argc , char* argv[]){
 	printf("%lf s\n", accum);
 
 	cout << "Escribiendo imagen" << endl;
-	img.write(out);	
+	img1.write(out);
 	    
 	cout << "Listo" << endl;
 	return 0;
