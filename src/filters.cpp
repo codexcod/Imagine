@@ -86,3 +86,16 @@ void merge(ppm& img1, ppm& img2, float alpha)
 		}		
 	}
 }
+
+void crop(ppm &img, unsigned char k, unsigned char t){
+	ppm img_target = ppm(img.width - t, img.height - k);
+	for (size_t i = k; i < img.height; i++)
+	{
+		for (size_t j = t; j < img.width; j++)
+		{
+			img_target.setPixel(i - k, j - t, img.getPixel(i, j));
+		}
+	}
+	img = img_target;
+
+};
