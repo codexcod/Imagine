@@ -39,6 +39,9 @@ void blackWhite(ppm& img, int start, int end)
 	}
 }
 
+
+// Dada una imagen y un numero de threads, convierte
+// la imagen en blanco y negro
 void blackWhiteMultiThread(ppm& img, int n_threads)
 {
 
@@ -60,6 +63,9 @@ void blackWhiteMultiThread(ppm& img, int n_threads)
 	}
 }
 
+
+// Dadas dos imagenes y un alpha indicando que tanto se va
+// destacar la imagen1, las mezcla
 void merge(ppm& img1, ppm& img2, float alpha)
 {
 
@@ -85,4 +91,32 @@ void merge(ppm& img1, ppm& img2, float alpha)
 			img1.setPixel(i,j, pixel(r3, g3, b3).truncate());
 		}		
 	}
+}
+
+
+// Dadas dos imagenes, una auxiliar de salida, otra de entrada
+// y un numero indicando que tanto se hara, se hace
+// un digital zoom de la imagen de entrada
+void zoom(ppm &aux_img, ppm &img, int cant_zoom)
+{
+	for(int i = 0; i < img.height / cant_zoom; i++)
+	{
+		for(int j = 0; j < img.width / cant_zoom; j++)
+		{	
+			int r1 =img.getPixel(i,j).r;
+			int g1 =img.getPixel(i,j).g;
+			int b1 =img.getPixel(i,j).b;
+
+			// Recorro imagen auxiliar
+			for(int k = 0; k < cant_zoom; k++)
+			{
+				for(int h = 0; h < cant_zoom; h++)
+				{
+					aux_img.setPixel(i * cant_zoom + k, j * cant_zoom + h, pixel(r1, g1, b1));
+				}
+
+			}
+		}		
+	}
+
 }
