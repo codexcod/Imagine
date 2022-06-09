@@ -134,5 +134,21 @@ void zoom(ppm &aux_img, ppm &img, int cant_zoom)
 			}
 		}		
 	}
+}
 
+
+// Dada una imagen, un numero de filas y un numero de columnas
+// recorta una imagen
+void crop(ppm &img, int rows, int columns)
+{	
+	ppm img_aux = ppm(img.width - columns, img.height - rows);
+
+	for(int i = rows; i < img.height; i++)
+	{
+		for(int j = columns; j < img.width; j++) {
+			img_aux.setPixel(i - rows, j - columns, img.getPixel(i, j).truncate());
+		}			
+	}
+
+	img = img_aux;
 }
