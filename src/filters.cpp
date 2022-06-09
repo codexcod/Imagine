@@ -94,6 +94,23 @@ void merge(ppm& img1, ppm& img2, float alpha)
 }
 
 
+// Dada una imagen, la convierte en escala de grises
+void shades(ppm& img, unsigned char shades) 
+{
+	float range = 255 / ( shades - 1 );
+
+	for(int i = 0; i < img.height; i++) 
+	{
+		for(int j = 0; j < img.width; j++) 
+		{
+			int gray = img.getPixel(i, j).cumsum() / 3 / range;
+			gray *= range;
+			img.setPixel(i, j, pixel(gray, gray, gray));
+		}
+	}
+}
+
+
 // Dadas dos imagenes, una auxiliar de salida, otra de entrada
 // y un numero indicando que tanto se hara, se hace
 // un digital zoom de la imagen de entrada

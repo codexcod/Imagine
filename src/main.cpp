@@ -73,6 +73,13 @@ int main(int argc , char* argv[]){
 
 		merge(img1, img2, p1);
 	} 
+	else if (filter == "shades")
+	{
+		// Imagen a escala de grises
+		// ./main shades 1 <shades> <ruta_img1> <ruta_img_result>
+
+		shades(img1, p1);
+	}
 	else if (filter == "zoom")
 	{
 		// Digital zoom de una imagen
