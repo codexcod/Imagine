@@ -93,18 +93,22 @@ void merge(ppm& img1, ppm& img2, float alpha)
 	}
 }
 
-void crop(ppm &img, unsigned char k, unsigned char t){
-	ppm img_target = ppm(img.width - t, img.height - k);
-	for (size_t i = k; i < img.height; i++)
+// Dada una imagen, la convierte en escala de grises
+void shades(ppm& img, unsigned char shades) 
+{
+	float range = 255 / ( shades - 1 );
+
+	for(int i = 0; i < img.height; i++) 
 	{
-		for (size_t j = t; j < img.width; j++)
+		for(int j = 0; j < img.width; j++) 
 		{
-			img_target.setPixel(i - k, j - t, img.getPixel(i, j));
+			int gray = img.getPixel(i, j).cumsum() / 3 / range;
+			gray *= range;
+			img.setPixel(i, j, pixel(gray, gray, gray));
 		}
 	}
-	img = img_target;
-
 }
+
 
 // Dadas dos imagenes, una auxiliar de salida, otra de entrada
 // y un numero indicando que tanto se hara, se hace
