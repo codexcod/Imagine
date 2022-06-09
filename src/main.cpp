@@ -88,6 +88,13 @@ int main(int argc , char* argv[]){
 		ppm img(img1);
 		zoom(img1, img, p1);
 	}
+	else if (filter == "crop")
+	{
+		// Recorte de una imagen
+		// ./main crop 1 <crop_rows> <ruta_img1> <ruta_img_result> <crop_columns>
+
+		crop(img1, p1, p2);
+	}
 
    	clock_gettime(CLOCK_REALTIME, &stop);
 
