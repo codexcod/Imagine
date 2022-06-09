@@ -35,9 +35,13 @@ int main(int argc , char* argv[]){
 	string img2_str;
 	ppm img2;
 
-	if (argc == 8)
+	if (argc == 7)
 	{
 		p2 = atof(argv[6]);
+	}
+
+	if (argc == 8)
+	{
 		img2_str = argv[7];
 		img2 = ppm(img2_str);
 	}
