@@ -138,7 +138,7 @@ void zoom(ppm &aux_img, ppm &img, int cant_zoom)
 
 
 // Convolución entre el kernel y la imagen con start y end
-void convolution(ppm &aux_img, ppm &img_target, short int kernel[], int start, int end)
+void convolution(ppm &aux_img, ppm &img_target, int kernel[], int start, int end)
 {
 	int r, g, b;
 
@@ -194,28 +194,27 @@ void edgeDetectionMultiThread(ppm &img, int n_threads)
 	blackWhiteMultiThread(img, n_threads);
 
 	// Convolucion horizontal
-	short int ker1[] = {1, 0, -1, 2, 0, -2, 1, 0, -1};
+	int ker1[] = {1, 0, -1, 2, 0, -2, 1, 0, -1};
 	ppm img1(img.width - 2,img.height - 2);
 
 	// Convolucion vertical
-	short int ker2[] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
+	int ker2[] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
 	ppm img2(img.width - 2,img.height - 2);
 
 	for (int i = 0; i < n_threads; i++)
 	{
+
 		start = i * rows_for_thread;
-	
 		if (start == 0)
 			start=1;
+
 		end = (i + 1) * rows_for_thread;
-	
-		if (i == n_threads - 1) {
+		if (i == n_threads - 1)
 			end += offset - 1;
-		}
 
 		
-		threads_result.push_back(thread(convolution, &img, &img1, ker1, start, end));
-		threads_result.push_back(thread(convolution, &img, &img2, ker2, start, end));
+		threads_result.push_back(thread(convolution, ref(img), ref(img1), ker1, start, end));
+		threads_result.push_back(thread(convolution, ref(img), ref(img2), ker2, start, end));
 	}
 	
 	for (int i = 0; i < n_threads * 2; i++)
@@ -223,7 +222,7 @@ void edgeDetectionMultiThread(ppm &img, int n_threads)
         threads_result[i].join();
 	}
 
-	sobel(img1,img2);
+	sobel(img1, img2);
 
 	img = img1;
 }
