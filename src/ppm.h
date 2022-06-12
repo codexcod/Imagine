@@ -1,8 +1,6 @@
 #ifndef PPM_H
 #define PPM_H
 
-#include <math.h>
-
 using namespace std;
 
 
@@ -22,8 +20,6 @@ struct pixel{
     pixel& mult(float k){ r *= k; g *= k; b *= k; return *this; }
 
     pixel& addp(pixel p){ r += p.r; g += p.g; b += p.b; return *this; }
-
-    pixel& power(float k){ r = pow(r, k); g = pow(g, k); b = pow(b, k); return *this; }
 
     short int cumsum(){ return r + g + b; } 
 

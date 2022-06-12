@@ -137,6 +137,97 @@ void zoom(ppm &aux_img, ppm &img, int cant_zoom)
 }
 
 
+// Convolución entre el kernel y la imagen con start y end
+void convolution(ppm &aux_img, ppm &img_target, short int kernel[], int start, int end)
+{
+	int r, g, b;
+
+	// Recorro imagen
+	for (int y = start; y < end; y++) 
+	{
+		for (int x = 1; x < aux_img.width - 1; x++)
+		{
+			r = g = b = 0;
+
+			// Recorro kernel
+			for (int ky = 0; ky < 3; ky++)
+			{
+				for (int kx = 0; kx < 3; kx++)
+				{
+					r += aux_img.getPixel(y + ky - 1, x + kx - 1).r * kernel[ky * 3 + kx];
+					g += aux_img.getPixel(y + ky - 1 , x + kx - 1).g * kernel[ky * 3 + kx];
+					b += aux_img.getPixel(y + ky - 1, x + kx - 1).b * kernel[ky * 3 + kx];
+				}
+			}
+
+			img_target.setPixel(y - 1, x - 1, pixel(r, g, b).truncate());
+		}
+	}
+}
+
+// Filtro de sobel con dos imagenes
+void sobel(ppm &img1, ppm &img2)
+{
+	int r, g, b;
+
+	for (int y = 0; y < img1.height; y++)
+	{
+		for (int x = 0; x < img1.width; x++)
+		{
+			r = sqrt(pow(img1.getPixel(y, x).r, 2) + pow(img2.getPixel(y, x).r, 2));
+			g = sqrt(pow(img1.getPixel(y, x).g, 2) + pow(img2.getPixel(y, x).g, 2));
+			b = sqrt(pow(img1.getPixel(y, x).b, 2) + pow(img2.getPixel(y, x).b, 2));
+
+			img1.setPixel(y,x,pixel(r,g,b));
+		}
+	}
+}
+
+// Filtro de Edge Detection multi threaded
+void edgeDetectionMultiThread(ppm &img, int n_threads)
+{
+	int rows_for_thread = (int)(img.height / n_threads);
+	int start, end, offset = img.height - (rows_for_thread * n_threads);
+	vector<thread> threads_result;
+
+	// filtro blanco y negro
+	blackWhiteMultiThread(img, n_threads);
+
+	// Convolucion horizontal
+	short int ker1[] = {1, 0, -1, 2, 0, -2, 1, 0, -1};
+	ppm img1(img.width - 2,img.height - 2);
+
+	// Convolucion vertical
+	short int ker2[] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
+	ppm img2(img.width - 2,img.height - 2);
+
+	for (int i = 0; i < n_threads; i++)
+	{
+		start = i * rows_for_thread;
+	
+		if (start == 0)
+			start=1;
+		end = (i + 1) * rows_for_thread;
+	
+		if (i == n_threads - 1) {
+			end += offset - 1;
+		}
+
+		
+		threads_result.push_back(thread(convolution, &img, &img1, ker1, start, end));
+		threads_result.push_back(thread(convolution, &img, &img2, ker2, start, end));
+	}
+	
+	for (int i = 0; i < n_threads * 2; i++)
+	{
+        threads_result[i].join();
+	}
+
+	sobel(img1,img2);
+
+	img = img1;
+}
+
 // Dada una imagen, un numero de filas y un numero de columnas
 // recorta una imagen
 void crop(ppm &img, int rows, int columns)
@@ -151,67 +242,4 @@ void crop(ppm &img, int rows, int columns)
 	}
 
 	img = img_aux;
-}
-
-
-void convolution(ppm& img, int kernel[3][3]) {
-	ppm out_img (img.width-2, img.height-2);
-		
-	for(int y = 1; y < img.height-1; y++) {
-		for(int x = 1; x < img.width-1; x++) {
-			pixel summation;
-			for(int i = -1; i <=1; i++) {
-				for(int j = -1; j <=1; j++) {
-					summation.addp(img.getPixel(i+y, j+x).mult(kernel[i+1][j+1])); 
-				}
-			}
-			out_img.setPixel(y-1,x-1, summation.mult((float)1/9).truncate());
-		}
-	}
-	img = out_img;
-}
-
-
-void boxBlur(ppm &img, int iterations=1) {
-	int kernel[3][3] = {
-		{1,1,1},
-		{1,1,1},
-		{1,1,1}
-	};
-	for (int i=0; i<=iterations; i++) convolution(img, kernel);
-}
-
-
-void edgeDetection(ppm &img) {
-	shades(img, 8);
-	boxBlur(img, 5);
-	int kernel_x[3][3] = {
-		{1,0,-1},
-		{2,0,-2},
-		{1,0,-1}
-	};
-	int kernel_y[3][3] = {
-		{1, 2, 1},
-		{0, 0, 0},
-		{-1, -2, -1}
-	};
-	ppm img_x = img;
-	ppm img_y = img;
-	
-	convolution(img_x, kernel_x);	
-	convolution(img_y, kernel_y);
-
-	for(int y = 1; y < img.height-4; y++) {
-		for(int x = 1; x < img.width-4; x++) {
-			pixel pixel_x = img_x.getPixel(y,x);
-			pixel pixel_y = img_y.getPixel(y,x);
-			
-			pixel_x = pixel_x.power(2);
-			pixel_y = pixel_y.power(2);
-			pixel result = pixel_x;
-			
-			result = result.addp(pixel_y).power(((float)1/2));
-			img.setPixel(y, x, result);
-		}
-	}
 }

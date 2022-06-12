@@ -22,6 +22,6 @@ void crop(ppm &img, int rows, int columns);
 // MULTI-THREAD FILTERS
 
 void blackWhiteMultiThread(ppm& img, int n_threads);
-void edgeDetectionMultiThread(ppm &img, ppm &img_target, int n_threads);
+void edgeDetectionMultiThread(ppm &img, int n_threads);
 
 #endif
