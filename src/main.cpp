@@ -99,6 +99,13 @@ int main(int argc , char* argv[]){
 
 		crop(img1, p1, p2);
 	}
+	else if (filter == "ed")
+	{
+		// Edge detection
+		// ./main ed <n_threads> 0 <ruta_img1> <ruta_img_result>
+
+		edgeDetectionMultiThread(img1, n_threads);
+	}
 
    	clock_gettime(CLOCK_REALTIME, &stop);
 
